@@ -37,7 +37,7 @@ def sunrise_sunset(day=int(datetime.now().day), month=int(datetime.now().month),
     calculates and returns either sunrise or sunset times or both values
 
     :param day: int
-        day of given month
+        day of the month
     :param month: int
     :param year: int
     :param latitude: float
@@ -52,14 +52,14 @@ def sunrise_sunset(day=int(datetime.now().day), month=int(datetime.now().month),
         contains datetime objects with 'sunset' and/or 'sunrise' keys or a str key with never
         dict may contain str values for error handling under key 'error'
     """
-    types = {'official': 90.5, 'nautical': 102, 'civil': 96, 'astronomical': 108}
+    types = {'official': 90.83, 'nautical': 102, 'civil': 96, 'astronomical': 108}
     mode = ['riseonly', 'setonly', 'both']
     if angle not in types:
         return {'error': 'Can not assign given angle: ' + str(angle) + '. Type must be in: ' + str(types)}
     if rise_or_set not in mode:
         return {'error': 'This mode does not exist: ' + str(rise_or_set) + '. Must be in: ' + str(mode)}
 
-    zenit_radians = to_radians(types[angle])
+    zenith_radians = to_radians(types[angle])
     latitude_radians = to_radians(latitude)
 
     # 1. calculation for the day of the year
@@ -102,7 +102,7 @@ def sunrise_sunset(day=int(datetime.now().day), month=int(datetime.now().month),
     cos_dec = cos(asin(sin_dec))
 
     # 7a. Sun's local hour angle
-    cos_h = (cos(zenit_radians) - (sin_dec * sin(latitude_radians))) / \
+    cos_h = (cos(zenith_radians) - (sin_dec * sin(latitude_radians))) / \
             (cos_dec * cos(latitude_radians))
 
     if cos_h > 1:
@@ -133,7 +133,6 @@ def sunrise_sunset(day=int(datetime.now().day), month=int(datetime.now().month),
         if not utc:
             set_UT = set_UT - time.timezone / 3600
         extracted_set_time = extract_time(set_UT)
-        print(str(extracted_set_time))
         set_datetime = datetime(year, month, day, extracted_set_time['hours'], extracted_set_time['minutes'],
                                 extracted_set_time['seconds'], extracted_set_time['microseconds'])
     UT = T - lng_hour
