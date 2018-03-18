@@ -108,6 +108,7 @@ AUTH_PASSWORD_VALIDATORS = [
 HUEY = {
     'name': 'plantcontrol',
     'url': os.environ.get('REDIS_URL', 'redis://localhost:6379/?db=1'),
+    'always_eager': False,
     'consumer': {
         'workers': 4,
         'worker_type': 'thread',
@@ -115,7 +116,6 @@ HUEY = {
         'backoff': 1.15,  # Exponential backoff using this rate, -b.
         'max_delay': 10.0,  # Max possible polling interval, -m.
         'utc': False,  # Treat ETAs and schedules as UTC datetimes.
-        'scheduler_interval': 1,  # Check schedule every second, -s.
         'periodic': True,  # Enable crontab feature.
         'check_worker_health': True,  # Enable worker health checks.
         'health_check_interval': 1,  # Check worker health every second.
