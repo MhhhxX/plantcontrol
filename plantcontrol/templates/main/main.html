@@ -17,8 +17,11 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
         <script src="{% static "js/handle_delete.js" %}"></script>
         <script src="{% static "js/relais-toggle.js" %}"></script>
+        <script src="{% static "js/resize_canvas.js" %}"></script>
         <script>
             const dataPrecision = 25;
+            var pause = false;
+
             function initDataList() {
                 var values = [];
                 for (var i = 0; i<dataPrecision; i++) {
@@ -51,13 +54,24 @@
             };
 
             $(document).ready(function () {
+                $("#chart-pause").click(function () {
+                    if($(this).text() === 'pause') {
+                        $(this).html('<i class="material-icons">play_arrow</i>');
+                        pause = true;
+                    } else {
+                        $(this).html('<i class="material-icons">pause</i>');
+                        pause = false;
+                        updateChart();
+                    }
+            });
+
                 function updateChart() {
                     $.ajax({
                     type: 'GET',
                     url: 'update_chart',
                     dataType: "json",
                     data: {
-                       "update_chart": "True",
+                       "update_chart": "True"
                     }
                     }).success(function (data) {
                         myBar.data.labels.splice(0, 1);
@@ -70,9 +84,10 @@
                         $("#temperature").text(data['temperature']);
                         $("#humidity").text(data['humidity']);
                     }).complete(function (data) {
-                        setTimeout(function () {
-                            updateChart();
-                        }, 3000)
+                        if (!pause)
+                            setTimeout(function () {
+                                updateChart();
+                            }, 3000)
                     });
                 }
 
@@ -81,7 +96,7 @@
                     type: 'line',
                     data: barChartData,
                     options: {
-                        responsive: true,
+                        responsive: false,
                         events: ["click"],
                         title: {
                             display: true,
@@ -120,9 +135,9 @@
                                 },
                                 gridLines: {
                                     //drawOnChartArea: false
-                                    borderDash: [5, 15],
+                                    borderDash: [5, 15]
                                 }
-                            }],
+                            }]
                         }
                     }
                 });

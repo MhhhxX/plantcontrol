@@ -5,16 +5,17 @@
 
 {% block chart %}
 
-    <div class="container">
-        <h2 class="text-center">Live Chart</h2>
-        <canvas height="200px" id="chart"></canvas>
-        <h6>Live data:</h6>
-        <div class="row">
-            <div class="col">Temperature: <span id="temperature"></span>°C</div>
-            <div class="col">Humidity: <span id="humidity"></span>%</div>
-        </div>
+<div class="container">
+    <h2 class="text-center">Live Chart</h2>
+    <canvas id="chart"></canvas>
+    <button id="chart-pause" class="btn btn-info"><i class="material-icons">pause</i></button>
+    <h6>Live data:</h6>
+    <div class="row">
+        <div class="col">Temperature: <span id="temperature"></span>°C</div>
+        <div class="col">Humidity: <span id="humidity"></span>%</div>
     </div>
-    <br>
+</div>
+<br>
 {% endblock chart %}
 
 {% block settings %}
@@ -145,33 +146,33 @@
 
 {% block control %}
 
-    <div class="container">
-        <h2 class="text-center">Controls</h2>
-        <div class="row d-none d-sm-flex">
-            <div class="col-sm"><span class="font-weight-bold">Relais</span></div>
-            <div class="col-sm"><span class="font-weight-bold">Sensors</span></div>
-        </div>
-        <div class="row">
-            <div class="row d-sm-none"><div class="col ml-3"><span class="font-weight-bold">Relais</span></div></div>
-            <div class="col-sm">
-                {% for r in relais %}
-                    <div class="row">
-                        <div class="col-8">{{ r.name }}</div>
-                        <div class="col-4">
-                            <button type="button" class="btn btn-sm btn-toggle relais-toggle {% if r.state %} active {% endif %}" autocomplete="off"
-                                    relais-id="{{ r.relais_id }}">
-                                <div class="handle"></div>
-                            </button>
-                        </div>
+<div class="container">
+    <h2 class="text-center">Controls</h2>
+    <div class="row d-none d-sm-flex">
+        <div class="col-sm"><span class="font-weight-bold">Relais</span></div>
+        <div class="col-sm"><span class="font-weight-bold">Sensors</span></div>
+    </div>
+    <div class="row">
+        <div class="row d-sm-none"><div class="col ml-3"><span class="font-weight-bold">Relais</span></div></div>
+        <div class="col-sm">
+            {% for r in relais %}
+                <div class="row">
+                    <div class="col-8">{{ r.name }}</div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-sm btn-toggle relais-toggle {% if r.state %} active {% endif %}" autocomplete="off"
+                                relais-id="{{ r.relais_id }}">
+                            <div class="handle"></div>
+                        </button>
                     </div>
-                {% endfor %}
+                </div>
+            {% endfor %}
 
-            </div>
-            <div class="row d-sm-none"><div class="col ml-3"><span class="font-weight-bold">Sensors</span></div></div>
-            <div class="col-sm">
-                sef
-            </div>
+        </div>
+        <div class="row d-sm-none"><div class="col ml-3"><span class="font-weight-bold">Sensors</span></div></div>
+        <div class="col-sm">
+            sef
         </div>
     </div>
+</div>
 
 {% endblock control %}

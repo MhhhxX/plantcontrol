@@ -1,4 +1,4 @@
-import Adafruit_DHT
+# import Adafruit_DHT
 from datetime import datetime
 from .models import HygroTempData
 from .models import SensorSettings

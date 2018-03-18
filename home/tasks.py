@@ -35,10 +35,9 @@ def hygro_temp_logging():
 
 @db_periodic_task(validate_sunset())
 def light_at_sunset():
-    if light_pin:
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(light_pin, GPIO.OUT)
-        GPIO.output(light_pin, 1)
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(light_pin, GPIO.OUT)
+    GPIO.output(light_pin, 1)
 
 
 @db_periodic_task(crontab(hour='21', minute='0'))
