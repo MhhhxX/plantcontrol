@@ -1,20 +1,20 @@
 import RPi.GPIO as GPIO
 
 from huey import crontab
-from huey.contrib.djhuey import db_periodic_task
+from huey.contrib.djhuey import db_periodic_task, periodic_task, task
 from .models import HygroTempData, SensorSettings, RelaisSettings
 from .sensor import Sensor
 from .utils import validate_sunset
 
 sensor = Sensor()
 light_pin = RelaisSettings.objects.get(name='Licht').GPIO_pin
-temp_limit = 14.0
-pump_pin = 3
-fan_pin = 4
+pump_pin = RelaisSettings.objects.get(name='Pumpe').GPIO_pin
+fan_pin = RelaisSettings.objects.get(name='Lüfter').GPIO_pin
 sensor_id = 0
+temp_limit = 14.0
 
 
-@db_periodic_task(crontab(day='', minute='/*5', hour='0-7,20-23'))
+@db_periodic_task(crontab(day='', minute='/*10', hour='0-7,20-23'))
 def water_cooling():
     GPIO.setmode(GPIO.BCM)
     hygro_temp_data = sensor.read(0)
@@ -46,3 +46,18 @@ def daily_light_shutdown():
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(light_pin, GPIO.OUT)
     GPIO.output(light_pin, 0)
+
+
+@task()
+def airing_shutdown():
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(fan_pin, GPIO.OUT)
+    GPIO.output(fan_pin, 0)
+
+
+@periodic_task(crontab(hour='8', minute='0'))
+def daily_airing():
+    airing_shutdown.schedule(delay=1800, convert_utc=False)
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(fan_pin, GPIO.OUT)
+    GPIO.output(fan_pin, 1)
