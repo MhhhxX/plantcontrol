@@ -5,7 +5,7 @@ from huey import crontab
 from huey.contrib.djhuey import db_periodic_task, periodic_task, task
 from .models import HygroTempData, SensorSettings, RelaisSettings
 from .sensor import Sensor
-from .utils import validate_sunset
+from .utils import validate_sunset, error_pin
 
 sensor = Sensor()
 try:
@@ -24,19 +24,18 @@ sensor_id = 0
 temp_limit = 14.0
 
 
-@db_periodic_task(crontab(day='', minute='/*10', hour='0-7,20-23'))
+@db_periodic_task(crontab(minute='*/10', hour='20-23,0-7'))
 def water_cooling():
-    if pump_pin != -1 and fan_pin != -1:
-        GPIO.setmode(GPIO.BCM)
-        hygro_temp_data = sensor.read(0)
-        if hygro_temp_data.temperature >= temp_limit:
-            GPIO.setup([pump_pin, fan_pin], GPIO.OUT)
-            GPIO.output([pump_pin, fan_pin], 1)
-        else:
-            GPIO.setup([pump_pin, fan_pin], GPIO.OUT)
-            GPIO.output([pump_pin, fan_pin], 0)
+    if not error_pin(('pump', pump_pin), ('fan', fan_pin)):
+        return
+    GPIO.setmode(GPIO.BCM)
+    hygro_temp_data = sensor.read(0)
+    if hygro_temp_data.temperature >= temp_limit:
+        GPIO.setup([pump_pin, fan_pin], GPIO.OUT)
+        GPIO.output([pump_pin, fan_pin], 1)
     else:
-        print("Watercooling needs fan and pump specified! Please provide table entries for fan and pump")
+        GPIO.setup([pump_pin, fan_pin], GPIO.OUT)
+        GPIO.output([pump_pin, fan_pin], 0)
 
 
 @db_periodic_task(crontab(minute='*/5'))
@@ -48,40 +47,36 @@ def hygro_temp_logging():
 
 @db_periodic_task(validate_sunset())
 def light_at_sunset():
-    if light_pin != -1:
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(light_pin, GPIO.OUT)
-        GPIO.output(light_pin, 1)
-    else:
-        print("No light device specified. Please add a table entry in Relay Settings where name is 'Licht'")
+    if not error_pin(('light', light_pin)):
+        return
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(light_pin, GPIO.OUT)
+    GPIO.output(light_pin, 1)
 
 
 @db_periodic_task(crontab(hour='21', minute='0'))
 def daily_light_shutdown():
-    if light_pin != -1:
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(light_pin, GPIO.OUT)
-        GPIO.output(light_pin, 0)
-    else:
-        print("No light device specified. Please add a table entry in Relay Settings where name is 'Licht'")
+    if not error_pin(('light', light_pin)):
+        return
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(light_pin, GPIO.OUT)
+    GPIO.output(light_pin, 0)
 
 
 @task()
 def airing_shutdown():
-    if fan_pin != -1:
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(fan_pin, GPIO.OUT)
-        GPIO.output(fan_pin, 0)
-    else:
-        print("No fan specified. Please add a table entry in Relay Settings where name is Lüfter")
+    if not error_pin(('fan', fan_pin)):
+        return
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(fan_pin, GPIO.OUT)
+    GPIO.output(fan_pin, 0)
 
 
 @periodic_task(crontab(hour='8', minute='0'))
 def daily_airing():
-    if fan_pin != -1:
-        airing_shutdown.schedule(delay=1800, convert_utc=False)
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(fan_pin, GPIO.OUT)
-        GPIO.output(fan_pin, 1)
-    else:
-        print("No fan specified. Please add a table entry in Relay Settings where name is Lüfter")
+    if not error_pin(('fan', fan_pin)):
+        return
+    airing_shutdown.schedule(delay=1800, convert_utc=False)
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(fan_pin, GPIO.OUT)
+    GPIO.output(fan_pin, 1)
