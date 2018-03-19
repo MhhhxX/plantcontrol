@@ -5,37 +5,27 @@ from huey import crontab
 from huey.contrib.djhuey import db_periodic_task, periodic_task, task
 from .models import HygroTempData, SensorSettings, RelaisSettings
 from .sensor import Sensor
-from .utils import validate_sunset, error_pin
+from .utils import validate_sunset
 
+device_names = {'fan': 'Lüfter', 'light': 'Licht', 'pump': 'Pumpe'}
 sensor = Sensor()
-try:
-    light_pin = RelaisSettings.objects.get(name='Licht').GPIO_pin
-except ObjectDoesNotExist:
-    light_pin = -1
-try:
-    pump_pin = RelaisSettings.objects.get(name='Pumpe').GPIO_pin
-except ObjectDoesNotExist:
-    pump_pin = -1
-try:
-    fan_pin = RelaisSettings.objects.get(name='Lüfter').GPIO_pin
-except ObjectDoesNotExist:
-    fan_pin = -1
 sensor_id = 0
 temp_limit = 14.0
 
 
 @db_periodic_task(crontab(minute='*/10', hour='20-23,0-7'))
 def water_cooling():
-    if not error_pin(('pump', pump_pin), ('fan', fan_pin)):
+    pins = pin_checkup('fan', 'pump')
+    if not pins:
         return
     GPIO.setmode(GPIO.BCM)
     hygro_temp_data = sensor.read(0)
     if hygro_temp_data.temperature >= temp_limit:
-        GPIO.setup([pump_pin, fan_pin], GPIO.OUT)
-        GPIO.output([pump_pin, fan_pin], 1)
+        GPIO.setup([pins['pump'], pins['fan']], GPIO.OUT)
+        GPIO.output([pins['pump'], pins['fan']], 1)
     else:
-        GPIO.setup([pump_pin, fan_pin], GPIO.OUT)
-        GPIO.output([pump_pin, fan_pin], 0)
+        GPIO.setup([pins['pump'], pins['fan']], GPIO.OUT)
+        GPIO.output([pins['pump'], pins['fan']], 0)
 
 
 @db_periodic_task(crontab(minute='*/5'))
@@ -47,36 +37,57 @@ def hygro_temp_logging():
 
 @db_periodic_task(validate_sunset())
 def light_at_sunset():
-    if not error_pin(('light', light_pin)):
+    pins = pin_checkup('light')
+    if not pins:
         return
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(light_pin, GPIO.OUT)
-    GPIO.output(light_pin, 1)
+    gpio_switch(pins['light'], state=1)
 
 
 @db_periodic_task(crontab(hour='21', minute='0'))
 def daily_light_shutdown():
-    if not error_pin(('light', light_pin)):
+    pins = pin_checkup('light')
+    if not pins:
         return
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(light_pin, GPIO.OUT)
-    GPIO.output(light_pin, 0)
+    gpio_switch(pins['light'], state=0)
 
 
 @task()
 def airing_shutdown():
-    if not error_pin(('fan', fan_pin)):
+    pins = pin_checkup('fan')
+    if not pins:
         return
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(fan_pin, GPIO.OUT)
-    GPIO.output(fan_pin, 0)
+    gpio_switch(pins['fan'], state=0)
 
 
 @periodic_task(crontab(hour='8', minute='0'))
 def daily_airing():
-    if not error_pin(('fan', fan_pin)):
+    pins = pin_checkup('fan')
+    if not pins:
         return
     airing_shutdown.schedule(delay=1800, convert_utc=False)
+    gpio_switch(pins['fan'], state=1)
+
+
+def pin_checkup(*pins):
+    results = {}
+    for pin in pins:
+        if pin in device_names:
+            try:
+                result = RelaisSettings.objects.get(name=device_names[pin]).GPIO_pin
+                results.update({pin: result})
+            except ObjectDoesNotExist:
+                    print("{} is not specified. Please add a table entry for {} where name is '{}'".
+                          format(pin, pin, device_names[pin]))
+                    return {}
+        else:
+            print("There is no task for {}!".format(pin))
+            return {}
+    return results
+
+
+def gpio_switch(*pins, state: int):
+    if state != 0 and state != 1:
+        state = 1
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(fan_pin, GPIO.OUT)
-    GPIO.output(fan_pin, 1)
+    GPIO.setup(pins, GPIO.OUT)
+    GPIO.output(pins, state)
