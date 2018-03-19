@@ -15,7 +15,6 @@ def home(request):
                'sensor': SensorSettings.objects.all()}
     if request.method == 'POST':
         data = request.POST
-        print(data)
         if 'sensor_id' in data:
             form = SensorModelForm(data)
         else:

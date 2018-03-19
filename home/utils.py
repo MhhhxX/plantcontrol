@@ -3,8 +3,6 @@ from math import floor, sin, cos, tan, atan, asin, acos, pi, fabs
 import time
 from functools import lru_cache
 
-device_names = {'fan': 'Lüfter', 'light': 'Licht', 'pump': 'Pumpe'}
-
 
 def validate_sunrise():
     sunrise = sunrise_sunset(rise_or_set='riseonly')['sunrise']
@@ -183,12 +181,3 @@ def adjust_value24(x):
     if x > 24.0:
         return x - 24.0
     return x
-
-
-def error_pin(*pins):
-    for pin in pins:
-        if pin[1] == -1:
-            print("{} is not specified. Please add a table entry for {} where name is '{}'".
-                  format(pin[0], pin[0], device_names[pin[0]]))
-            return False
-    return True
