@@ -1,4 +1,7 @@
-import RPi.GPIO as GPIO
+try:
+    import RPi.GPIO as GPIO
+except RuntimeError:
+    print('Can not import RPi.GPIO!')
 
 from django.core.exceptions import ObjectDoesNotExist
 from huey import crontab

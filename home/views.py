@@ -1,5 +1,9 @@
+try:
+    import RPi.GPIO as GPIO
+except RuntimeError:
+    print('Can not import RPi.GPIO!')
 import random
-import RPi.GPIO as GPIO
+
 from django.shortcuts import render, get_object_or_404
 from datetime import datetime
 from django.template import RequestContext, loader
