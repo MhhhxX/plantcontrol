@@ -44,12 +44,12 @@
                     label: 'Temperature',
                     backgroundColor: ['rgba(255, 165, 0, 0.5)'],
                     yAxisID: "y-axis-1",
-                    data: initDataList(),
+                    data: initDataList()
                 }, {
                     label: 'Humidity',
                     backgroundColor: ['rgba(51, 102, 255, 0.5)'],
                     yAxisID: "y-axis-2",
-                    data: initDataList(),
+                    data: initDataList()
                 }]
             };
 
@@ -96,7 +96,8 @@
                     type: 'line',
                     data: barChartData,
                     options: {
-                        responsive: false,
+                        responsive: true,
+                        maintainAspectRatio: false,
                         events: ["click"],
                         title: {
                             display: true,
