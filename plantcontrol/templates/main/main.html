@@ -42,13 +42,17 @@
                 labels: initTimeList(),
                 datasets: [{
                     label: 'Temperature',
-                    backgroundColor: ['rgba(255, 165, 0, 0.5)'],
+                    backgroundColor: 'rgba(255, 165, 0, 0.5)',
+                    borderColor: 'rgba(255, 165, 0, 0.7)',
                     yAxisID: "y-axis-1",
+                    fill: false,
                     data: initDataList()
                 }, {
                     label: 'Humidity',
-                    backgroundColor: ['rgba(51, 102, 255, 0.5)'],
+                    backgroundColor: 'rgba(51, 102, 255, 0.5)',
+                    borderColor: 'rgba(51, 102, 255, 0.7)',
                     yAxisID: "y-axis-2",
+                    fill: false,
                     data: initDataList()
                 }]
             };
@@ -105,7 +109,18 @@
                         },
                         tooltips: {
                             mode: 'index',
-                            intersect: true
+                            intersect: true,
+                            callbacks: {
+                                label: function (tooltipItem, data) {
+                                        var label = data.datasets[tooltipItem.datasetIndex].label || '';
+                                        if (label)
+                                            label += ': ';
+                                        if (tooltipItem.datasetIndex === 0)
+                                            return label  + tooltipItem.yLabel + "°C";
+                                        else
+                                            return label + tooltipItem.yLabel + "%";
+                                }
+                            }
                         },
                         scales: {
                             yAxes: [{
@@ -116,7 +131,7 @@
                                 ticks: {
                                     min: 5,
                                     max: 90,
-                                    stepsize: 5,
+                                    stepSize: 5,
                                     callback: function (value, index, values) {
                                         return value + "°C";
                                     }
@@ -129,7 +144,7 @@
                                 ticks: {
                                     min: 5,
                                     max: 90,
-                                    stepsize: 0.5,
+                                    stepSize: 5,
                                     callback: function (value, index, values) {
                                         return value + "%";
                                     }
