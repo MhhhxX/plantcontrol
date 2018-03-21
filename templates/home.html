@@ -48,99 +48,87 @@
             </tbody>
         </table>
     </div>
-    <div class="row">
-        <div class="control-group" id="fields">
-            <div class="controls">
-                <form role="form" autocomplete="off" method="post">
-                    <div class="form-row">
-                        {% csrf_token %}
-                        <div class="form-group col-md-2">
-                            <label for="{{ relais_form.relais_id.id_for_label }}">Id</label>
-                            {{ relais_form.relais_id }}
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="{{ relais_form.name.id_for_label }}">Name</label>
-                            {{ relais_form.name }}
-                        </div>
-                        <div class="form-group col-md-2">
-                            <label for="{{ relais_form.GPIO_pin.id_for_label }}">Pin</label>
-                            {{ relais_form.GPIO_pin }}
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="{{ relais_form.description.id_for_label }}">Description</label>
-                            {{ relais_form.description }}
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <div class="col-sm-10">
-                            <button type="submit" class="btn btn-success"><i class="material-icons">add</i></button>
-                        </div>
-                    </div>
-                </form>
-            <br>
+    <form role="form" autocomplete="off" method="post">
+        <div class="form-row">
+            {% csrf_token %}
+            <div class="form-group col-md-2">
+                <label for="{{ relais_form.relais_id.id_for_label }}">Id</label>
+                {{ relais_form.relais_id }}
+            </div>
+            <div class="form-group col-md-4">
+                <label for="{{ relais_form.name.id_for_label }}">Name</label>
+                {{ relais_form.name }}
+            </div>
+            <div class="form-group col-md-2">
+                <label for="{{ relais_form.GPIO_pin.id_for_label }}">Pin</label>
+                {{ relais_form.GPIO_pin }}
+            </div>
+            <div class="form-group col-md-4">
+                <label for="{{ relais_form.description.id_for_label }}">Description</label>
+                {{ relais_form.description }}
             </div>
         </div>
-    </div>
+        <div class="form-group row">
+            <div class="col-sm-10">
+                <button type="submit" class="btn btn-success"><i class="material-icons">add</i></button>
+            </div>
+        </div>
+    </form>
+            <br>
 
         <br>
-        <h4>Sensor Settings</h4>
-        <div class="table-responsive-sm">
-            <table class="table table-striped table-dark">
-                <thead>
+    <h4>Sensor Settings</h4>
+    <div class="table-responsive-sm">
+        <table class="table table-striped table-dark">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">GPIO-Pin</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in sensor %}
                     <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">GPIO-Pin</th>
-                        <th scope="col">Description</th>
-                        <th scope="col">Delete</th>
+                        <th scope="row">{{ s.sensor_id }}</th>
+                        <td>{{ s.type }}</td>
+                        <td>{{ s.GPIO_pin }}</td>
+                        <td>{{ s.description }}</td>
+                        <td><button class="btn btn-danger btn-remove delete-sensor" type="button"><i class="material-icons">remove</i></button></td>
                     </tr>
-                </thead>
-                <tbody>
-                    {% for s in sensor %}
-                        <tr>
-                            <th scope="row">{{ s.sensor_id }}</th>
-                            <td>{{ s.type }}</td>
-                            <td>{{ s.GPIO_pin }}</td>
-                            <td>{{ s.description }}</td>
-                            <td><button class="btn btn-danger btn-remove delete-sensor" type="button"><i class="material-icons">remove</i></button></td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    <div class="row">
-        <div class="control-group" id="fields">
-            <div class="controls">
-                <form role="form" autocomplete="off" method="post">
-                    <div class="form-row">
-                        {% csrf_token %}
-                        <div class="form-group col-md-2">
-                            <label for="{{ sensor_form.sensor_id.id_for_label }}">Id</label>
-                            {{ sensor_form.sensor_id }}
-                        </div>
-                        <div class="form-group col-md-2">
-                            <label for="{{ sensor_form.type.id_for_label }}">Type</label>
-                            {{ sensor_form.type }}
-                        </div>
-                        <div class="form-group col-md-2">
-                            <label for="{{ sensor_form.GPIO_pin.id_for_label }}">Pin</label>
-                            {{ sensor_form.GPIO_pin }}
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="{{ sensor_form.description.id_for_label }}">Description</label>
-                            {{ sensor_form.description }}
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <div class="col-sm-10">
-                            <button type="submit" class="btn btn-success"><i class="material-icons">add</i> </button>
-                        </div>
-                    </div>
-                </form>
-            <br>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <form role="form" autocomplete="off" method="post">
+        <div class="form-row">
+            {% csrf_token %}
+            <div class="form-group col-md-2">
+                <label for="{{ sensor_form.sensor_id.id_for_label }}">Id</label>
+                {{ sensor_form.sensor_id }}
+            </div>
+            <div class="form-group col-md-2">
+                <label for="{{ sensor_form.type.id_for_label }}">Type</label>
+                {{ sensor_form.type }}
+            </div>
+            <div class="form-group col-md-2">
+                <label for="{{ sensor_form.GPIO_pin.id_for_label }}">Pin</label>
+                {{ sensor_form.GPIO_pin }}
+            </div>
+            <div class="form-group col-md-6">
+                <label for="{{ sensor_form.description.id_for_label }}">Description</label>
+                {{ sensor_form.description }}
             </div>
         </div>
-    </div>
+        <div class="form-group row">
+            <div class="col-sm-10">
+                <button type="submit" class="btn btn-success"><i class="material-icons">add</i> </button>
+            </div>
+        </div>
+    </form>
+            <br>
 </div>
     <br>
 
