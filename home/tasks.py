@@ -5,7 +5,7 @@ except RuntimeError:
 
 from huey import crontab
 from huey.contrib.djhuey import db_periodic_task, periodic_task, task
-from .models import HygroTempData, SensorSettings, RelaisSettings
+from .models import HygroTempData, SensorSettings, RelaySettings
 from .sensor import Sensor
 from .utils import validate_sunset
 
@@ -16,7 +16,7 @@ temp_limit = 14.0
 
 @db_periodic_task(crontab(minute='*/10', hour='20-23,0-7'))
 def water_cooling():
-    pins = RelaisSettings.pin_checkup('fan', 'pump')
+    pins = RelaySettings.pin_checkup('fan', 'pump')
     if not pins:
         return
     GPIO.setmode(GPIO.BCM)
@@ -38,7 +38,7 @@ def hygro_temp_logging():
 
 @db_periodic_task(validate_sunset())
 def light_at_sunset():
-    pins = RelaisSettings.pin_checkup('light')
+    pins = RelaySettings.pin_checkup('light')
     if not pins:
         return
     gpio_switch(pins['light'], state=1)
@@ -46,7 +46,7 @@ def light_at_sunset():
 
 @db_periodic_task(crontab(hour='21', minute='0'))
 def daily_light_shutdown():
-    pins = RelaisSettings.pin_checkup('light')
+    pins = RelaySettings.pin_checkup('light')
     if not pins:
         return
     gpio_switch(pins['light'], state=0)
@@ -54,7 +54,7 @@ def daily_light_shutdown():
 
 @task()
 def airing_shutdown():
-    pins = RelaisSettings.pin_checkup('fan')
+    pins = RelaySettings.pin_checkup('fan')
     if not pins:
         return
     gpio_switch(pins['fan'], state=0)
@@ -62,7 +62,7 @@ def airing_shutdown():
 
 @periodic_task(crontab(hour='8,20', minute='0'))
 def daily_airing():
-    pins = RelaisSettings.pin_checkup('fan')
+    pins = RelaySettings.pin_checkup('fan')
     if not pins:
         return
     airing_shutdown.schedule(delay=1800, convert_utc=False)

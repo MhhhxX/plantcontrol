@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .models import RelaisSettings
+from .models import RelaySettings
 from .utils import validate_sunset, sunrise_sunset
 from datetime import datetime, timedelta
 # Create your tests here.
@@ -7,13 +7,13 @@ from datetime import datetime, timedelta
 
 class RelayTestCase(TestCase):
     def setUp(self):
-        RelaisSettings.objects.create(name="Pumpe", GPIO_pin=1, description="Wasserpumpe für Kühlung",
-                                      relais_id=1, state=False)
-        RelaisSettings.objects.create(name="Lüfter", GPIO_pin=2, description="Radiator Kühlung", relais_id=2, state=False)
+        RelaySettings.objects.create(name="Pumpe", GPIO_pin=1, description="Wasserpumpe für Kühlung",
+                                     relais_id=1, state=False)
+        RelaySettings.objects.create(name="Lüfter", GPIO_pin=2, description="Radiator Kühlung", relais_id=2, state=False)
 
     def test_pin_checkup(self):
-        pins = RelaisSettings.pin_checkup('pump', 'fan')
-        pins_empty = RelaisSettings.pin_checkup('light')
+        pins = RelaySettings.pin_checkup('pump', 'fan')
+        pins_empty = RelaySettings.pin_checkup('light')
         self.assertTrue('pump' in pins)
         self.assertTrue('fan' in pins)
         self.assertFalse('light' in pins)

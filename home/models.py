@@ -4,7 +4,8 @@ from django.core.exceptions import ObjectDoesNotExist
 # Create your models here.
 device_names = {'fan': 'Lüfter', 'light': 'Licht', 'pump': 'Pumpe'}
 
-class RelaisSettings(models.Model):
+
+class RelaySettings(models.Model):
     relais_id = models.IntegerField(primary_key=True)
     GPIO_pin = models.IntegerField(unique=True)
     description = models.CharField(max_length=30, default="Description")
@@ -17,7 +18,7 @@ class RelaisSettings(models.Model):
         for pin in pins:
             if pin in device_names:
                 try:
-                    result = RelaisSettings.objects.get(name=device_names[pin]).GPIO_pin
+                    result = RelaySettings.objects.get(name=device_names[pin]).GPIO_pin
                     results.update({pin: result})
                 except ObjectDoesNotExist:
                     print("{} is not specified. Please add a table entry for {} where name is '{}'".
@@ -45,3 +46,19 @@ class HygroTempData(models.Model):
     timestamp = models.DateTimeField()
     sensor = models.ForeignKey(SensorSettings, models.CASCADE, default=-1)
 
+    @staticmethod
+    def data_period(dt_from, dt_until):
+        lt_exclude = HygroTempData.objects.exclude(timestamp__lt=dt_from)
+        return lt_exclude.exclude(timestamp__gt=dt_until)
+
+    @staticmethod
+    def mean(dt_from, dt_until):
+        period_data = HygroTempData.data_period(dt_from, dt_until)
+
+        partial_sum_temp = 0
+        partial_sum_hum = 0
+        for data in period_data:
+            partial_sum_temp += data.temperature
+            partial_sum_hum += data.humidity
+
+        return partial_sum_temp / period_data.__len__(), partial_sum_hum / period_data.__len__()
