@@ -14,7 +14,7 @@ from .forms import RelaisModelForm, SensorModelForm
 
 
 def home(request):
-    # check_relais_state()
+    check_relais_state()
     context = {'relais': RelaySettings.objects.all(), 'relais_form': RelaisModelForm, 'sensor_form': SensorModelForm,
                'sensor': SensorSettings.objects.all()}
     if request.method == 'POST':
