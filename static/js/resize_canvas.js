@@ -1,5 +1,3 @@
-var mql = window.matchMedia("(orientation: portrait)").matches;
-
 function resize(){
     var chart = $("#chart");
     var chartContainer = $(chart).parent();
