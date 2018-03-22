@@ -26,14 +26,14 @@ $(function () {
                 }
             }
         });
-    $(document).on('click', '.delete-relais', function (e) {
+    $(document).on('click', '.delete-relay', function (e) {
         e.preventDefault();
 
         var id = $(this).parent().parent().find('th').text();
         var row = $(this).parent().parent();
-        $.post("delete_relais/", {'delete_id': id})
+        $.post("delete_relay/", {'delete_id': id})
             .fail(function () {
-                console.log('failed to delete relais number: ' + id);
+                console.log('failed to delete relay number: ' + id);
             })
             .done(function () {
                 $(row).remove();

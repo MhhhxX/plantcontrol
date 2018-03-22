@@ -6,7 +6,7 @@ device_names = {'fan': 'Lüfter', 'light': 'Licht', 'pump': 'Pumpe'}
 
 
 class RelaySettings(models.Model):
-    relais_id = models.IntegerField(primary_key=True)
+    relay_id = models.IntegerField(primary_key=True)
     GPIO_pin = models.IntegerField(unique=True)
     description = models.CharField(max_length=30, default="Description")
     name = models.CharField(max_length=15, default="Name")

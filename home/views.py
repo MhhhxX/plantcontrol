@@ -9,20 +9,20 @@ from datetime import datetime
 from django.template import RequestContext, loader
 from django.http import HttpResponse, JsonResponse
 from .models import RelaySettings, SensorSettings
-from .forms import RelaisModelForm, SensorModelForm
+from .forms import RelayModelForm, SensorModelForm
 # Create your views here.
 
 
 def home(request):
-    check_relais_state()
-    context = {'relais': RelaySettings.objects.all(), 'relais_form': RelaisModelForm, 'sensor_form': SensorModelForm,
+    # check_relay_state()
+    context = {'relay': RelaySettings.objects.all(), 'relay_form': RelayModelForm, 'sensor_form': SensorModelForm,
                'sensor': SensorSettings.objects.all()}
     if request.method == 'POST':
         data = request.POST
         if 'sensor_id' in data:
             form = SensorModelForm(data)
         else:
-            form = RelaisModelForm(data)
+            form = RelayModelForm(data)
         if form.is_valid():
             form.save()
             return render(request, 'home.html', context)
@@ -49,44 +49,44 @@ def randomize_test_data():
     return {'temperature': temperature, 'humidity': humidity, 'timestamp': timestamp}
 
 
-def delete_relais(request):
-    relais_id = request.POST
-    RelaySettings.objects.get(relais_id=relais_id['delete_id']).delete()
-    context = {'relais': RelaySettings.objects.all(), 'relais_form': RelaisModelForm}
+def delete_relay(request):
+    relay_id = request.POST
+    RelaySettings.objects.get(relay_id=relay_id['delete_id']).delete()
+    context = {'relay': RelaySettings.objects.all(), 'relay_form': RelayModelForm}
     return render(request, 'home.html', context)
 
 
 def delete_sensor(request):
     sensor_id = request.POST
     SensorSettings.objects.get(sensor_id=sensor_id['delete_id']).delete()
-    context = {'relais': RelaySettings.objects.all(), 'relais_form': RelaisModelForm}
+    context = {'relay': RelaySettings.objects.all(), 'relay_form': RelayModelForm}
     return render(request, 'home.html', context)
 
 
-def switch_relais(request):
-    r_id = request.GET.get('relais_id')
-    relais = RelaySettings.objects.get(relais_id=r_id)
-    GPIO.setup(relais.GPIO_pin, GPIO.OUT)
-    if relais.state is False:
-        GPIO.output(relais.GPIO_pin, 1)
-        relais.state = True
-        relais.save()
+def switch_relay(request):
+    r_id = request.GET.get('relay_id')
+    relay = RelaySettings.objects.get(relay_id=r_id)
+    GPIO.setup(relay.GPIO_pin, GPIO.OUT)
+    if relay.state is False:
+        GPIO.output(relay.GPIO_pin, 1)
+        relay.state = True
+        relay.save()
         return JsonResponse({'state': 1})
     else:
-        GPIO.output(relais.GPIO_pin, 0)
-        relais.state = False
-        relais.save()
+        GPIO.output(relay.GPIO_pin, 0)
+        relay.state = False
+        relay.save()
         return JsonResponse({'state': 0})
 
 
-def check_relais_state():
+def check_relay_state():
     GPIO.setmode(GPIO.BCM)
-    for relais in RelaySettings.objects.all():
-        pin = relais.GPIO_pin
+    for relay in RelaySettings.objects.all():
+        pin = relay.GPIO_pin
         GPIO.setup(pin, GPIO.OUT)
-        if GPIO.input(pin) == 0 and relais.state is True:
-            relais.state = False
-            relais.save()
-        if GPIO.input(pin) == 1 and relais.state is False:
-            relais.state = True
-            relais.save()
+        if GPIO.input(pin) == 0 and relay.state is True:
+            relay.state = False
+            relay.save()
+        if GPIO.input(pin) == 1 and relay.state is False:
+            relay.state = True
+            relay.save()
