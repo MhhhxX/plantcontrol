@@ -10,161 +10,19 @@
 <html>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Terrarium Control</title>
+        <title>Plant Control</title>
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <link href="{% static "css/switch_button.css" %}" rel="stylesheet">
+        <link href="{% static "css/home.css" %}" rel="stylesheet">
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
         <script src="{% static "js/handle_delete.js" %}"></script>
         <script src="{% static "js/relais-toggle.js" %}"></script>
-        <script src="{% static "js/resize_canvas.js" %}"></script>
-        <script>
-            const dataPrecision = 25;
-            var pause = false;
-
-            function initDataList() {
-                var values = [];
-                for (var i = 0; i<dataPrecision; i++) {
-                    values.push(0.0);
-                }
-                return values;
-            }
-
-            function initTimeList() {
-                var values = [];
-                for (var i = 0; i < dataPrecision; i++) {
-                    values.push("00:00:00");
-                }
-                return values;
-            }
-
-            var barChartData = {
-                labels: initTimeList(),
-                datasets: [{
-                    label: 'Temperature',
-                    backgroundColor: 'rgba(255, 165, 0, 0.5)',
-                    borderColor: 'rgba(255, 165, 0, 0.7)',
-                    yAxisID: "y-axis-1",
-                    fill: false,
-                    data: initDataList()
-                }, {
-                    label: 'Humidity',
-                    backgroundColor: 'rgba(51, 102, 255, 0.5)',
-                    borderColor: 'rgba(51, 102, 255, 0.7)',
-                    yAxisID: "y-axis-2",
-                    fill: false,
-                    data: initDataList()
-                }]
-            };
-
-            $(document).ready(function () {
-                $("#chart-pause").click(function () {
-                    if($(this).text() === 'pause') {
-                        $(this).html('<i class="material-icons">play_arrow</i>');
-                        pause = true;
-                    } else {
-                        $(this).html('<i class="material-icons">pause</i>');
-                        pause = false;
-                        updateChart();
-                    }
-            });
-
-                function updateChart() {
-                    $.ajax({
-                    type: 'GET',
-                    url: 'update_chart',
-                    dataType: "json",
-                    data: {
-                       "update_chart": "True"
-                    }
-                    }).success(function (data) {
-                        myBar.data.labels.splice(0, 1);
-                        myBar.data.labels.push(data['time']);
-                        myBar.data.datasets[0].data.splice(0, 1);
-                        myBar.data.datasets[1].data.splice(0, 1);
-                        myBar.data.datasets[0].data.push(parseFloat(data['temperature']));
-                        myBar.data.datasets[1].data.push(parseFloat(data['humidity']));
-                        myBar.update();
-                        $("#temperature").text(data['temperature']);
-                        $("#humidity").text(data['humidity']);
-                    }).complete(function (data) {
-                        if (!pause)
-                            setTimeout(function () {
-                                updateChart();
-                            }, 3000)
-                    });
-                }
-
-                var ctx = document.getElementById("chart").getContext("2d");
-                var myBar = new Chart(ctx, {
-                    type: 'line',
-                    data: barChartData,
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        events: ["click"],
-                        title: {
-                            display: true,
-                            text: "Temperature, Humidity Live Chart"
-                        },
-                        tooltips: {
-                            mode: 'index',
-                            intersect: true,
-                            callbacks: {
-                                label: function (tooltipItem, data) {
-                                        var label = data.datasets[tooltipItem.datasetIndex].label || '';
-                                        if (label)
-                                            label += ': ';
-                                        if (tooltipItem.datasetIndex === 0)
-                                            return label  + tooltipItem.yLabel + "°C";
-                                        else
-                                            return label + tooltipItem.yLabel + "%";
-                                }
-                            }
-                        },
-                        scales: {
-                            yAxes: [{
-                                type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
-                                display: true,
-                                position: "left",
-                                id: "y-axis-1",
-                                ticks: {
-                                    min: 5,
-                                    max: 90,
-                                    stepSize: 5,
-                                    callback: function (value, index, values) {
-                                        return value + "°C";
-                                    }
-                                }
-                            }, {
-                                type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
-                                display: true,
-                                position: "right",
-                                id: "y-axis-2",
-                                ticks: {
-                                    min: 5,
-                                    max: 90,
-                                    stepSize: 5,
-                                    callback: function (value, index, values) {
-                                        return value + "%";
-                                    }
-                                },
-                                gridLines: {
-                                    //drawOnChartArea: false
-                                    borderDash: [5, 15]
-                                }
-                            }]
-                        }
-                    }
-                });
-
-                updateChart();
-            });
-        </script>
+        <script src="{% static "js/live_chart.js" %}"></script>
     </head>
     <body>
         <nav class="navbar navbar-dark bg-dark">
-            <a class="navbar-brand" href="#">AutoTerra</a>
+            <a class="navbar-brand" href="#">Plant Control</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>

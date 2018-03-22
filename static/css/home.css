@@ -1,0 +1,10 @@
+.chart-wrapper > canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    pointer-events:none;
+}
+
+.chart-wrapper {
+    position: relative;
+}
