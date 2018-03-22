@@ -1,14 +1,13 @@
 $(function () {
-   $(document).on('click', '.relais-toggle', function (e) {
+   $(document).on('click', '.relay-toggle', function (e) {
        e.preventDefault();
-       console.log("saefasef");
-       var relais_id = $(this).attr('relais-id');
+       var relay_id = $(this).attr('relay-id');
        var button = $(this);
        $.ajax({
            type: 'GET',
-           url: 'switch_relais/',
+           url: 'switch_relay/',
            dataType: 'json',
-           data: {'relais_id': relais_id}
+           data: {'relay_id': relay_id}
        }).done(function (data) {
            if(data['state'] === 0)
                $(button).removeClass('active');

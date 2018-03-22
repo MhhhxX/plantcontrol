@@ -28,7 +28,7 @@
 
 {% block settings %}
 <div class="container">
-    <h2 class="text-center">Relays and Sensors</h2>
+    <h2 class="text-center">Relays and Sensors <i class="material-icons">settings</i></h2>
     <h4>Relay Settings</h4>
     <div class="table-responsive-sm">
         <table class="table table-dark table-striped">
@@ -43,16 +43,16 @@
                 </tr>
             </thead>
             <tbody>
-                {% for r in relais %}
+                {% for r in relay %}
                     <tr>
-                        <th scope="row">{{ r.relais_id }}</th>
+                        <th scope="row">{{ r.relay_id }}</th>
                         <td>{{ r.name }}</td>
                         <td>{{ r.GPIO_pin }}</td>
                         <td>{{ r.description }}</td>
-                        <td><button type="button" class="btn btn-sm btn-toggle relais-toggle {% if r.state %} active {% endif %}" autocomplete="off" relais-id="{{ r.relais_id }}">
+                        <td><button type="button" class="btn btn-sm btn-toggle relay-toggle {% if r.state %} active {% endif %}" autocomplete="off" relay-id="{{ r.relay_id }}">
                             <div class="handle"></div>
                         </button></td>
-                        <td><button class="btn btn-xs btn-danger btn-remove delete-relais" type="button"><i class="material-icons">remove</i></button></td>
+                        <td><button class="btn btn-xs btn-danger btn-remove delete-relay" type="button"><i class="material-icons">remove</i></button></td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -62,20 +62,20 @@
         <div class="form-row">
             {% csrf_token %}
             <div class="form-group col-md-2">
-                <label for="{{ relais_form.relais_id.id_for_label }}">Id:</label>
-                {{ relais_form.relais_id }}
+                <label for="{{ relay_form.relay_id.id_for_label }}">Id:</label>
+                {{ relay_form.relay_id }}
             </div>
             <div class="form-group col-md-4">
-                <label for="{{ relais_form.name.id_for_label }}">Name:</label>
-                {{ relais_form.name }}
+                <label for="{{ relay_form.name.id_for_label }}">Name:</label>
+                {{ relay_form.name }}
             </div>
             <div class="form-group col-md-2">
-                <label for="{{ relais_form.GPIO_pin.id_for_label }}">Pin:</label>
-                {{ relais_form.GPIO_pin }}
+                <label for="{{ relay_form.GPIO_pin.id_for_label }}">Pin:</label>
+                {{ relay_form.GPIO_pin }}
             </div>
             <div class="form-group col-md-4">
-                <label for="{{ relais_form.description.id_for_label }}">Description:</label>
-                {{ relais_form.description }}
+                <label for="{{ relay_form.description.id_for_label }}">Description:</label>
+                {{ relay_form.description }}
             </div>
         </div>
         <div class="form-group row">
