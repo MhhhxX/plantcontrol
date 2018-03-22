@@ -7,8 +7,14 @@
 
 <div class="container">
     <h2 class="text-center">Live Chart</h2>
-    <div class="w-100">
-        <canvas id="chart" style="width: 100%; height: 100%"></canvas>
+    <div class="chart-wrapper">
+        <div class="w-100 canvas-wrapper" style="overflow-x: scroll; position: relative">
+            <div class="scroll-container" style="width: 100%; height: 100%; position: relative">
+                <canvas id="chart"></canvas>
+            </div>
+        </div>
+        <canvas id="fixed-chart-axis-1" width="0"></canvas>
+        <canvas id="fixed-chart-axis-2" width="0"></canvas>
     </div>
     <button id="chart-pause" class="btn btn-info"><i class="material-icons">pause</i></button>
     <h6>Live data:</h6>
@@ -52,19 +58,19 @@
         <div class="form-row">
             {% csrf_token %}
             <div class="form-group col-md-2">
-                <label for="{{ relais_form.relais_id.id_for_label }}">Id</label>
+                <label for="{{ relais_form.relais_id.id_for_label }}">Id:</label>
                 {{ relais_form.relais_id }}
             </div>
             <div class="form-group col-md-4">
-                <label for="{{ relais_form.name.id_for_label }}">Name</label>
+                <label for="{{ relais_form.name.id_for_label }}">Name:</label>
                 {{ relais_form.name }}
             </div>
             <div class="form-group col-md-2">
-                <label for="{{ relais_form.GPIO_pin.id_for_label }}">Pin</label>
+                <label for="{{ relais_form.GPIO_pin.id_for_label }}">Pin:</label>
                 {{ relais_form.GPIO_pin }}
             </div>
             <div class="form-group col-md-4">
-                <label for="{{ relais_form.description.id_for_label }}">Description</label>
+                <label for="{{ relais_form.description.id_for_label }}">Description:</label>
                 {{ relais_form.description }}
             </div>
         </div>
@@ -106,19 +112,19 @@
         <div class="form-row">
             {% csrf_token %}
             <div class="form-group col-md-2">
-                <label for="{{ sensor_form.sensor_id.id_for_label }}">Id</label>
+                <label for="{{ sensor_form.sensor_id.id_for_label }}">Id:</label>
                 {{ sensor_form.sensor_id }}
             </div>
             <div class="form-group col-md-2">
-                <label for="{{ sensor_form.type.id_for_label }}">Type</label>
+                <label for="{{ sensor_form.type.id_for_label }}">Type:</label>
                 {{ sensor_form.type }}
             </div>
             <div class="form-group col-md-2">
-                <label for="{{ sensor_form.GPIO_pin.id_for_label }}">Pin</label>
+                <label for="{{ sensor_form.GPIO_pin.id_for_label }}">Pin:</label>
                 {{ sensor_form.GPIO_pin }}
             </div>
             <div class="form-group col-md-6">
-                <label for="{{ sensor_form.description.id_for_label }}">Description</label>
+                <label for="{{ sensor_form.description.id_for_label }}">Description:</label>
                 {{ sensor_form.description }}
             </div>
         </div>

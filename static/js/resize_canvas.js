@@ -5,28 +5,13 @@ function resize(){
     var chartContainer = $(chart).parent();
     var windowHeight = Math.floor($(window).height());
 
-    if ($(window).width() <= 767.98)
+    // set min-width to 50 * dataPrecision
+    $(chart).css("min-width", "1250px");
+
+    // mobile browsers calculate dimension values differently
+    if ($(window).width() < 768) {
         $(chartContainer).css('height', 0.15 * windowHeight + "px");
+    }
     else
         $(chartContainer).css('height', 0.25 * windowHeight + "px");
 }
-
-$(document).ready(function(){
-    resize();
-
-        $(window).on("resize", function () {
-            if ($(window).width() <= 767.98) {
-                var newMql = window.matchMedia("(orientation: portrait)").matches;
-                if (mql && !newMql) {
-                    mql = newMql;
-                    resize();
-                } else if (!mql && newMql) {
-                    mql = newMql;
-                    resize();
-                }
-            } else {
-                resize();
-            }
-        });
-
-});
