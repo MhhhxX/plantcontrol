@@ -28,8 +28,8 @@
 
 {% block settings %}
 <div class="container">
-    <h2 class="text-center">Settings</h2>
-    <h4>Relais Settings</h4>
+    <h2 class="text-center">Relays and Sensors</h2>
+    <h4>Relay Settings</h4>
     <div class="table-responsive-sm">
         <table class="table table-dark table-striped">
             <thead>
@@ -38,6 +38,7 @@
                     <th scope="col">Name</th>
                     <th scope="col">GPIO-Pin</th>
                     <th scope="col">Description</th>
+                    <th scope="col">On/Off</th>
                     <th scope="col">Delete</th>
                 </tr>
             </thead>
@@ -48,6 +49,9 @@
                         <td>{{ r.name }}</td>
                         <td>{{ r.GPIO_pin }}</td>
                         <td>{{ r.description }}</td>
+                        <td><button type="button" class="btn btn-sm btn-toggle relais-toggle {% if r.state %} active {% endif %}" autocomplete="off" relais-id="{{ r.relais_id }}">
+                            <div class="handle"></div>
+                        </button></td>
                         <td><button class="btn btn-xs btn-danger btn-remove delete-relais" type="button"><i class="material-icons">remove</i></button></td>
                     </tr>
                 {% endfor %}
@@ -145,28 +149,11 @@
 <div class="container">
     <h2 class="text-center">Controls</h2>
     <div class="row d-none d-sm-flex">
-        <div class="col-sm"><span class="font-weight-bold">Relais</span></div>
         <div class="col-sm"><span class="font-weight-bold">Sensors</span></div>
     </div>
     <div class="row">
-        <div class="row d-sm-none"><div class="col ml-3"><span class="font-weight-bold">Relais</span></div></div>
-        <div class="col-sm">
-            {% for r in relais %}
-                <div class="row">
-                    <div class="col-8">{{ r.name }}</div>
-                    <div class="col-4">
-                        <button type="button" class="btn btn-sm btn-toggle relais-toggle {% if r.state %} active {% endif %}" autocomplete="off"
-                                relais-id="{{ r.relais_id }}">
-                            <div class="handle"></div>
-                        </button>
-                    </div>
-                </div>
-            {% endfor %}
-
-        </div>
         <div class="row d-sm-none"><div class="col ml-3"><span class="font-weight-bold">Sensors</span></div></div>
         <div class="col-sm">
-            sef
         </div>
     </div>
 </div>
