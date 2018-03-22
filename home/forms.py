@@ -1,10 +1,10 @@
 from django.forms import ModelForm, NumberInput, TextInput
-from .models import RelaisSettings, SensorSettings
+from .models import RelaySettings, SensorSettings
 
 
 class RelaisModelForm(ModelForm):
     class Meta:
-        model = RelaisSettings
+        model = RelaySettings
         fields = ('relais_id', 'GPIO_pin', 'description', 'name')
         widgets = {
             'relais_id': NumberInput(attrs={'placeholder': 'Relais Id', 'class': 'form-control'}),

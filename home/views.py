@@ -8,14 +8,14 @@ from django.shortcuts import render, get_object_or_404
 from datetime import datetime
 from django.template import RequestContext, loader
 from django.http import HttpResponse, JsonResponse
-from .models import RelaisSettings, SensorSettings
+from .models import RelaySettings, SensorSettings
 from .forms import RelaisModelForm, SensorModelForm
 # Create your views here.
 
 
 def home(request):
-    check_relais_state()
-    context = {'relais': RelaisSettings.objects.all(), 'relais_form': RelaisModelForm, 'sensor_form': SensorModelForm,
+    # check_relais_state()
+    context = {'relais': RelaySettings.objects.all(), 'relais_form': RelaisModelForm, 'sensor_form': SensorModelForm,
                'sensor': SensorSettings.objects.all()}
     if request.method == 'POST':
         data = request.POST
@@ -51,21 +51,21 @@ def randomize_test_data():
 
 def delete_relais(request):
     relais_id = request.POST
-    RelaisSettings.objects.get(relais_id=relais_id['delete_id']).delete()
-    context = {'relais': RelaisSettings.objects.all(), 'relais_form': RelaisModelForm}
+    RelaySettings.objects.get(relais_id=relais_id['delete_id']).delete()
+    context = {'relais': RelaySettings.objects.all(), 'relais_form': RelaisModelForm}
     return render(request, 'home.html', context)
 
 
 def delete_sensor(request):
     sensor_id = request.POST
     SensorSettings.objects.get(sensor_id=sensor_id['delete_id']).delete()
-    context = {'relais': RelaisSettings.objects.all(), 'relais_form': RelaisModelForm}
+    context = {'relais': RelaySettings.objects.all(), 'relais_form': RelaisModelForm}
     return render(request, 'home.html', context)
 
 
 def switch_relais(request):
     r_id = request.GET.get('relais_id')
-    relais = RelaisSettings.objects.get(relais_id=r_id)
+    relais = RelaySettings.objects.get(relais_id=r_id)
     GPIO.setup(relais.GPIO_pin, GPIO.OUT)
     if relais.state is False:
         GPIO.output(relais.GPIO_pin, 1)
@@ -81,7 +81,7 @@ def switch_relais(request):
 
 def check_relais_state():
     GPIO.setmode(GPIO.BCM)
-    for relais in RelaisSettings.objects.all():
+    for relais in RelaySettings.objects.all():
         pin = relais.GPIO_pin
         GPIO.setup(pin, GPIO.OUT)
         if GPIO.input(pin) == 0 and relais.state is True:
