@@ -1,6 +1,8 @@
 try:
     import RPi.GPIO as GPIO
+    gpio_imported = True
 except RuntimeError:
+    gpio_imported = False
     print('Can not import RPi.GPIO!')
 import random
 
@@ -14,7 +16,8 @@ from .forms import RelayModelForm, SensorModelForm
 
 
 def home(request):
-    # check_relay_state()
+    if gpio_imported:
+        check_relay_state()
     context = {'relay': RelaySettings.objects.all(), 'relay_form': RelayModelForm, 'sensor_form': SensorModelForm,
                'sensor': SensorSettings.objects.all()}
     if request.method == 'POST':
