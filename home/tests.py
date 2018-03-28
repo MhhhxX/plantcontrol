@@ -1,15 +1,16 @@
 from django.test import TestCase
-from .models import RelaySettings
+from .models import RelaySettings, HygroTempData, SensorSettings
 from .utils import validate_sunset, sunrise_sunset
 from datetime import datetime, timedelta
+import pytz
 # Create your tests here.
 
 
 class RelayTestCase(TestCase):
     def setUp(self):
         RelaySettings.objects.create(name="Pumpe", GPIO_pin=1, description="Wasserpumpe für Kühlung",
-                                     relais_id=1, state=False)
-        RelaySettings.objects.create(name="Lüfter", GPIO_pin=2, description="Radiator Kühlung", relais_id=2, state=False)
+                                     relay_id=1, state=False)
+        RelaySettings.objects.create(name="Lüfter", GPIO_pin=2, description="Radiator Kühlung", relay_id=2, state=False)
 
     def test_pin_checkup(self):
         pins = RelaySettings.pin_checkup('pump', 'fan')
@@ -46,3 +47,28 @@ class ValidateDateCase(TestCase):
         else:
             self.assertFalse(validate_date(sunset_dt))
 
+
+class HygroTempCase(TestCase):
+    def setUp(self):
+        # parameter tzinfo may cause problems with python <3.6
+        self.dt1 = datetime(2018, 1, 1, 15, 43, 32, 0, tzinfo=pytz.UTC)
+        self.dt2 = datetime(2018, 1, 2, 12, 6, 14, 87, tzinfo=pytz.UTC)
+        self.dt3 = datetime(2018, 1, 3, 5, 25, 35, 0, tzinfo=pytz.UTC)
+        HygroTempData.objects.create(sensor_id=0, humidity=64.73, temperature=23.21, timestamp=self.dt1)
+        HygroTempData.objects.create(sensor_id=0, humidity=98.32, temperature=21.75, timestamp=self.dt2)
+        HygroTempData.objects.create(sensor_id=0, humidity=76.44, temperature=15.82, timestamp=self.dt3)
+        HygroTempData.objects.create(sensor_id=1, humidity=76.44, temperature=15.82, timestamp=self.dt3)
+
+    def test_mean(self):
+        means = HygroTempData.mean(self.dt1, self.dt3, 0)
+        means1 = HygroTempData.mean(self.dt1, self.dt3, 0, 1)
+        self.assertEqual(float(means.humidity), 79.83)
+        self.assertEqual(float(means.temperature), 20.26)
+        self.assertEqual(float(means1[0].humidity), 79.83)
+        self.assertEqual(float(means1[0].temperature), 20.26)
+        self.assertEqual(float(means1[1].humidity), 76.44)
+        self.assertEqual(float(means1[1].temperature), 15.82)
+
+    def test_latest_data(self):
+        latest = HygroTempData.latest_data(0)
+        self.assertEqual(latest.timestamp, self.dt3)
