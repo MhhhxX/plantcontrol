@@ -5,9 +5,9 @@ from functools import lru_cache
 
 
 def validate_sunrise():
-    sunrise = sunrise_sunset(rise_or_set='riseonly')['sunrise']
 
     def validate_date(dt):
+        sunrise = sunrise_sunset(year=dt.year, month=dt.month, day=dt.day, rise_or_set='riseonly')['sunrise']
         delta = sunrise - dt
         delta_seconds = fabs(int(delta.total_seconds()))
         return delta_seconds <= 30
@@ -16,11 +16,10 @@ def validate_sunrise():
 
 
 def validate_sunset():
-    sunset = sunrise_sunset(rise_or_set='setonly')['sunset']
 
     def validate_date(dt):
-        now = datetime.now()
-        limit_datetime = datetime(now.year, now.month, now.day, 21, 0, 0, 0)
+        sunset = sunrise_sunset(year=dt.year, month=dt.month, day=dt.day, rise_or_set='setonly')['sunset']
+        limit_datetime = datetime(dt.year, dt.month, dt.day, 21, 0, 0, 0)
         if dt > limit_datetime:
             return False
         delta = sunset - dt

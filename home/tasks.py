@@ -53,11 +53,11 @@ def daily_light_shutdown():
 
 
 @task()
-def airing_shutdown():
-    pins = RelaySettings.pin_checkup('fan')
+def shutdown(pin):
+    pins = RelaySettings.pin_checkup(pin)
     if not pins:
         return
-    gpio_switch(pins['fan'], state=0)
+    gpio_switch(pins[pin], state=0)
 
 
 @periodic_task(crontab(hour='8,20', minute='0'))
@@ -65,7 +65,7 @@ def daily_airing():
     pins = RelaySettings.pin_checkup('fan')
     if not pins:
         return
-    airing_shutdown.schedule(delay=1800, convert_utc=False)
+    shutdown.schedule(args='fan', delay=1800, convert_utc=False)
     gpio_switch(pins['fan'], state=1)
 
 
