@@ -15,10 +15,11 @@ def validate_sunrise():
     return validate_date
 
 
-def validate_sunset():
+def validate_sunset(latitude=48.4601, longitude=11.1276, angle='official', utc=False):
 
     def validate_date(dt):
-        sunset = sunrise_sunset(year=dt.year, month=dt.month, day=dt.day, rise_or_set='setonly')['sunset']
+        sunset = sunrise_sunset(year=dt.year, month=dt.month, day=dt.day, rise_or_set='setonly', latitude=latitude,
+                                longitude=longitude, angle=angle, utc=utc)['sunset']
         limit_datetime = datetime(dt.year, dt.month, dt.day, 21, 0, 0, 0)
         if dt > limit_datetime:
             return False

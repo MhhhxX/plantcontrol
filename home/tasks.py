@@ -8,6 +8,7 @@ from huey.contrib.djhuey import db_periodic_task, periodic_task, task
 from .models import HygroTempData, SensorSettings, RelaySettings
 from .sensor import Sensor
 from .utils import validate_sunset
+from datetime import datetime
 
 sensor = Sensor()
 sensor_id = 0
@@ -36,22 +37,6 @@ def hygro_temp_logging():
         d.save()
 
 
-@db_periodic_task(validate_sunset())
-def light_at_sunset():
-    pins = RelaySettings.pin_checkup('light')
-    if not pins:
-        return
-    gpio_switch(pins['light'], state=1)
-
-
-@db_periodic_task(crontab(hour='21', minute='0'))
-def daily_light_shutdown():
-    pins = RelaySettings.pin_checkup('light')
-    if not pins:
-        return
-    gpio_switch(pins['light'], state=0)
-
-
 @task()
 def shutdown(pin):
     pins = RelaySettings.pin_checkup(pin)
@@ -60,12 +45,26 @@ def shutdown(pin):
     gpio_switch(pins[pin], state=0)
 
 
+@db_periodic_task(validate_sunset())
+def light_at_sunset():
+    dt = datetime.now()
+    pins = RelaySettings.pin_checkup('light')
+    if not pins:
+        return
+    gpio_switch(pins['light'], state=1)
+    eta = datetime(dt.year, dt.month, dt.day, 21, 0, 0, 0)
+    if eta > dt:
+        shutdown.schedule(args=('light',), eta=eta, convert_utc=False)
+    else:
+        print("[Huey, function light_at_sunset]: datetime doesn't lie ahead. Can not schedule shutdown task")
+
+
 @periodic_task(crontab(hour='8,20', minute='0'))
 def daily_airing():
     pins = RelaySettings.pin_checkup('fan')
     if not pins:
         return
-    shutdown.schedule(args='fan', delay=1800, convert_utc=False)
+    shutdown.schedule(args=('fan',), delay=1800, convert_utc=False)
     gpio_switch(pins['fan'], state=1)
 
 

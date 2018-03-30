@@ -1,7 +1,9 @@
 from django.test import TestCase
-from .models import RelaySettings, HygroTempData, SensorSettings
+from .models import RelaySettings, HygroTempData, SensorSettings, device_names
 from .utils import validate_sunset, sunrise_sunset
+from .tasks import gpio_switch
 from datetime import datetime, timedelta
+import time
 import pytz
 # Create your tests here.
 
@@ -25,7 +27,9 @@ class ValidateDateCase(TestCase):
     def setUp(self):
         self.sunset = sunrise_sunset()
         dt = datetime.now()
+        self.sunset1 = sunrise_sunset(year=dt.year, month=dt.month, day=dt.day+1)
         self.limit_dt = datetime(year=dt.year, month=dt.month, day=dt.day, hour=21, minute=0, second=0, microsecond=0)
+        self.limit_dt1 = datetime(year=dt.year, month=dt.month, day=dt.day+1, hour=21, minute=0, second=0, microsecond=0)
         self.td = timedelta(hours=1)
         self.td_true = timedelta(seconds=15)
         self.td_true30 = timedelta(seconds=30)
@@ -33,6 +37,7 @@ class ValidateDateCase(TestCase):
     def test_validate_sunset(self):
         self.assertTrue('sunset' in self.sunset)
         sunset_dt = self.sunset['sunset']
+        sunset_dt1 = self.sunset1['sunset']
         sunset_plus_one = sunset_dt + self.td
         sunset_minus_one = sunset_dt - self.td
         sunset_plus_15sec = sunset_dt + self.td_true
@@ -46,6 +51,14 @@ class ValidateDateCase(TestCase):
             self.assertFalse(validate_date(sunset_minus_one))
         else:
             self.assertFalse(validate_date(sunset_dt))
+        if sunset_dt1 <= self.limit_dt1:
+            self.assertTrue(validate_date(sunset_dt1))
+            self.assertTrue(validate_date(sunset_dt1 + self.td_true))
+            self.assertTrue(validate_date(sunset_dt1 + self.td_true30))
+            self.assertFalse(validate_date(sunset_dt1 + self.td))
+            self.assertFalse(validate_date(sunset_dt1 - self.td))
+        else:
+            self.assertFalse(validate_date(sunset_dt1))
 
 
 class HygroTempCase(TestCase):
@@ -72,3 +85,17 @@ class HygroTempCase(TestCase):
     def test_latest_data(self):
         latest = HygroTempData.latest_data(0)
         self.assertEqual(latest.timestamp, self.dt3)
+
+
+class GpioTestCase(TestCase):
+    def setUp(self):
+        try:
+            import RPi.GPIO as GPIO
+        except RuntimeError:
+            self.skipTest('Device does not support GPIO. Test canceled')
+
+    def test_gpio_switch(self):
+        pins = RelaySettings.pin_checkup(*device_names)
+        gpio_switch(pins.values(), state=1)
+        time.sleep(3)
+        gpio_switch(pins.values(), state=0)
