@@ -41,6 +41,10 @@ class Sensor(object):
         return Sensor.__instance
 
     @SensorCacheDecorator()
+    def read_classic(self, pin, sensor_type):
+        return Adafruit_DHT.read(sensor_type, pin)
+
+    @SensorCacheDecorator()
     def read(self, sensor_id=0, mode='retry'):
         try:
             sensor_type, pin = self.get_sensor_conf(sensor_id)
