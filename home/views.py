@@ -39,7 +39,7 @@ def update_chart(request):
         # not yet implemented
         s = Sensor()
         data = s.read(sensor_id=0, mode='once')
-        timestamp = data.timestamp.hour + ":" + data.timestamp.minute + ":" + data.timestamp.second
+        timestamp = str(data.timestamp.hour) + ":" + str(data.timestamp.minute) + ":" + str(data.timestamp.second)
         # data = randomize_test_data()
         send_data = {'temperature': data.temperature, 'humidity': data.humidity, 'time': timestamp}
         return JsonResponse(send_data)

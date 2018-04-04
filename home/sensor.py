@@ -22,7 +22,7 @@ class SensorCacheDecorator:
         if time_diff < 2:
             return cache_data[0]
         new_data = self.func(self, sensor_id=sensor_id, mode=mode)
-        index = self.cache.index(cache_data)
+        index = self.cache.index(cache_data[0])
         self.cache[index] = new_data
         return new_data
 
@@ -69,12 +69,12 @@ class Sensor(object):
             sensor = SensorSettings.objects.get(sensor_id=sensor_id)
         except ObjectDoesNotExist:
             raise SensorException(sensor_id)
-        return sensor.type, sensor.pin
+        return sensor.type, sensor.GPIO_pin
 
     def read_all(self):
         data = []
         for sensor in SensorSettings.objects.all():
-            dht_data = self.read(sensor.sensor_id, 'retry')
+            dht_data = self.read(sensor_id=sensor.sensor_id, mode='retry')
             data.append(dht_data)
         return data
 
