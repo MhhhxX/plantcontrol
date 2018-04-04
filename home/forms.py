@@ -18,8 +18,9 @@ class SensorModelForm(ModelForm):
     class Meta:
         CHOICES = (('DHT11', 11), ('DHT22', 22))
         model = SensorSettings
-        fields = ('sensor_id', 'type', 'GPIO_pin', 'description')
+        fields = ('name', 'sensor_id', 'type', 'GPIO_pin', 'description')
         widgets = {
+            'name': TextInput(attrs={'placeholder': 'Name', 'class': 'form-control'}),
             'sensor_id': NumberInput(attrs={'placeholder': 'Sensor Id', 'class': 'form-control'}),
             'type': Select(attrs={'placeholder': 'Sensor Type', 'class': 'custom-select'}, choices=CHOICES),
             'GPIO_pin': NumberInput(attrs={'placeholder': 'GPIO Pin', 'class': 'form-control'}),

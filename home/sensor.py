@@ -12,16 +12,16 @@ class SensorCacheDecorator:
 
     def cache_hygro_temp_data(self, sensor_id, mode):
         dt_now = datetime.now()
-        cache_data = [x for x in self.cache if x.sensor_id == sensor_id][0]
+        cache_data = [x for x in self.cache if x.sensor_id == sensor_id]
         if not cache_data:
-            new_data = self.func(sensor_id, mode)
+            new_data = self.func(self, sensor_id=sensor_id, mode=mode)
             self.cache.append(new_data)
             return new_data
-        dt1 = cache_data.timestamp
+        dt1 = cache_data[0].timestamp
         time_diff = (dt_now - dt1).total_seconds()
         if time_diff < 2:
-            return cache_data
-        new_data = self.func(sensor_id, mode)
+            return cache_data[0]
+        new_data = self.func(self, sensor_id=sensor_id, mode=mode)
         index = self.cache.index(cache_data)
         self.cache[index] = new_data
         return new_data
@@ -47,7 +47,7 @@ class Sensor(object):
     @SensorCacheDecorator()
     def read(self, sensor_id=0, mode='retry'):
         try:
-            sensor_type, pin = self.get_sensor_conf(sensor_id)
+            sensor_type, pin = Sensor.get_sensor_conf(sensor_id=sensor_id)
         except SensorException:
             raise SensorException(sensor_id)
         if mode == 'retry':

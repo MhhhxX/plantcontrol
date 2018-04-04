@@ -5,6 +5,7 @@ except RuntimeError:
     gpio_imported = False
     print('Can not import RPi.GPIO!')
 import random
+from .sensor import Sensor
 
 from django.shortcuts import render, get_object_or_404
 from datetime import datetime
@@ -36,11 +37,11 @@ def update_chart(request):
     update = request.GET.get("update_chart") or "undefined"
     if update:
         # not yet implemented
-        # s = Sensor()
-        # data = s.read()
-        # timestamp = data.timestamp.hour + ":" + data.timestamp.minute + ":" + data.timestamp.second
-        data = randomize_test_data()
-        send_data = {'temperature': data["temperature"], 'humidity': data["humidity"], 'time': data["timestamp"]}
+        s = Sensor()
+        data = s.read(sensor_id=0, mode='once')
+        timestamp = data.timestamp.hour + ":" + data.timestamp.minute + ":" + data.timestamp.second
+        # data = randomize_test_data()
+        send_data = {'temperature': data.temperature, 'humidity': data.humidity, 'time': timestamp}
         return JsonResponse(send_data)
 
 
