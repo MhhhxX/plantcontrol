@@ -1,6 +1,9 @@
 from django.core.exceptions import ObjectDoesNotExist
 
-import Adafruit_DHT
+try:
+    import Adafruit_DHT
+except ModuleNotFoundError:
+    print("Module Adafruit_DHT not installed!")
 from datetime import datetime
 from .models import HygroTempData
 from .models import SensorSettings
@@ -41,8 +44,12 @@ class Sensor(object):
         return Sensor.__instance
 
     @SensorCacheDecorator()
-    def read_classic(self, pin, sensor_type):
-        return Adafruit_DHT.read(sensor_type, pin)
+    def read_classic(self, pin, sensor_type, mode):
+        if mode == 'once':
+            return Adafruit_DHT.read(sensor_type, pin)
+        elif mode == 'retry':
+            return Adafruit_DHT.read_retry(sensor_type, pin)
+        return None, None
 
     @SensorCacheDecorator()
     def read(self, sensor_id=0, mode='retry'):

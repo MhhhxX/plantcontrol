@@ -34,14 +34,16 @@ def home(request):
 
 
 def update_chart(request):
-    update = request.GET.get("update_chart") or "undefined"
+    update = request.GET.get("update_chart")
+    sensor_id = request.GET.get("sensor_id")
     if update:
-        # not yet implemented
         s = Sensor()
-        data = s.read(sensor_id=0, mode='once')
-        timestamp = str(data.timestamp.hour) + ":" + str(data.timestamp.minute) + ":" + str(data.timestamp.second)
+        data = s.read(sensor_id=sensor_id, mode='once')
         # data = randomize_test_data()
-        send_data = {'temperature': data.temperature, 'humidity': data.humidity, 'time': timestamp}
+        temperature = "{0:.2f}".format(data.temperature)
+        humidity = "{0:.2f}".format(data.humidity)
+        timestamp = "{:02d}:{:02d}:{:02d}".format(data.timestamp.hour, data.timestamp.minute, data.timestamp.second)
+        send_data = {'temperature': temperature, 'humidity': humidity, 'time': timestamp}
         return JsonResponse(send_data)
 
 

@@ -1,6 +1,7 @@
 const dataPrecision = 20;
 var pause = false;
 var myBar = null;
+var sensorId = 0;
 
 function initDataList() {
     var values = [];
@@ -100,7 +101,8 @@ $(document).ready(function () {
         url: 'update_chart',
         dataType: "json",
         data: {
-           "update_chart": "True"
+            "update_chart": "True",
+            "sensor_id": sensorId
         }
         }).success(function (data) {
             myBar.data.labels.splice(0, 1);
@@ -131,6 +133,10 @@ $(document).ready(function () {
             $(window).off('resize', orientationChange);
         };
         $(window).on('resize', orientationChange);
+    });
+    
+    $("#sensor-select").on('change', function (e) {
+        sensorId = this.value;
     });
 
     var ctx = document.getElementById("chart").getContext("2d");

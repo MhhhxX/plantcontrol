@@ -16,7 +16,20 @@
         <canvas id="fixed-chart-axis-1" width="0"></canvas>
         <canvas id="fixed-chart-axis-2" width="0"></canvas>
     </div>
-    <button id="chart-pause" class="btn btn-info"><i class="material-icons">pause</i></button>
+    <div class="row">
+        <div class="col">
+            <button id="chart-pause" class="btn btn-info"><i class="material-icons">pause</i>
+            </button>
+        </div>
+        <div class="col">
+            <select id="sensor-select">
+                {% for s in sensor %}
+                    <option value="{{ s.sensor_id }}">Sensor {{ s.sensor_id }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
     <h6>Live data:</h6>
     <div class="row">
         <div class="col">Temperature: <span id="temperature"></span>°C</div>
@@ -103,7 +116,7 @@
                 {% for s in sensor %}
                     <tr>
                         <th scope="row">{{ s.sensor_id }}</th>
-                        <td>{{ s.type }}</td>
+                        <td>DHT{{ s.type }}</td>
                         <td>{{ s.GPIO_pin }}</td>
                         <td>{{ s.description }}</td>
                         <td><button class="btn btn-danger btn-remove delete-sensor" type="button"><i class="material-icons">remove</i></button></td>

@@ -30,7 +30,7 @@ def water_cooling():
         GPIO.output([pins['pump'], pins['fan']], 0)
 
 
-@db_periodic_task(crontab(minute='*/5'))
+@db_periodic_task(crontab(minute='*/10'))
 def hygro_temp_logging():
     data = sensor.read_all()
     for d in data:

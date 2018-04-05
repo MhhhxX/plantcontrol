@@ -16,12 +16,12 @@ class RelayModelForm(ModelForm):
 
 class SensorModelForm(ModelForm):
     class Meta:
-        CHOICES = ((11, 11), (22, 22))
+        CHOICES = ((11, 'DHT11'), (22, 'DHT22'))
         model = SensorSettings
         fields = ('sensor_id', 'type', 'GPIO_pin', 'description')
         widgets = {
             'sensor_id': NumberInput(attrs={'placeholder': 'Sensor Id', 'class': 'form-control'}),
-            'type': IntegerField(attrs={'placeholder': 'Sensor Type', 'class': 'custom-select'}, choices=CHOICES),
+            'type': Select(attrs={'placeholder': 'Sensor Type', 'class': 'custom-select'}, choices=CHOICES),
             'GPIO_pin': NumberInput(attrs={'placeholder': 'GPIO Pin', 'class': 'form-control'}),
             'description': TextInput(attrs={'placeholder': 'Description', 'class': 'form-control'})
         }
