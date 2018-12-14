@@ -73,14 +73,14 @@ class HygroTempCase(TestCase):
         HygroTempData.objects.create(sensor_id=1, humidity=76.44, temperature=15.82, timestamp=self.dt3)
 
     def test_mean(self):
-        means = HygroTempData.mean(self.dt1, self.dt3, 0)
-        means1 = HygroTempData.mean(self.dt1, self.dt3, 0, 1)
-        self.assertEqual(float(means.humidity), 79.83)
-        self.assertEqual(float(means.temperature), 20.26)
-        self.assertEqual(float(means1[0].humidity), 79.83)
-        self.assertEqual(float(means1[0].temperature), 20.26)
-        self.assertEqual(float(means1[1].humidity), 76.44)
-        self.assertEqual(float(means1[1].temperature), 15.82)
+        means = HygroTempData.mean_from_set(self.dt1, self.dt3, 0)
+        means1 = HygroTempData.mean_from_set(self.dt1, self.dt3, 0, 1)
+        self.assertEqual(float(means[0]['humidity__avg']), 79.83)
+        self.assertEqual(float(means[0]['temperature__avg']), 20.26)
+        self.assertEqual(float(means1[0]['humidity__avg']), 79.83)
+        self.assertEqual(float(means1[0]['temperature__avg']), 20.26)
+        self.assertEqual(float(means1[1]['humidity__avg']), 76.44)
+        self.assertEqual(float(means1[1]['temperature__avg']), 15.82)
 
     def test_latest_data(self):
         latest = HygroTempData.latest_data(0)

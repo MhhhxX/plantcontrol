@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Avg, Max, Min
 from django.core.exceptions import ObjectDoesNotExist
 
 # Create your models here.
@@ -37,7 +38,32 @@ class SensorSettings(models.Model):
     description = models.CharField(max_length=30, default="Description")
 
     def __str__(self):
-        return "Sensor number: {}, Sensor Type: DHT{}, At GPIO-Pin: {}".format(self.sensor_id, self.type, self.GPIO_pin)
+        return "Sensor number: {}, Sensor Type: DHT{} at GPIO-Pin: {}".format(self.sensor_id, self.type, self.GPIO_pin)
+
+
+def aggregate_decorator(func):
+    """
+    Wraps aggregate functions in HygroTempData class.
+    :param func: function
+        function that takes a HygroTempData Queryset and returns aggregated data as dict
+    :return: func
+    """
+    def wrapper(dt_from, dt_until, *sensor_ids):
+        """
+        Calculates aggregations
+        :param dt_from: datetime
+        :param dt_until: datetime
+        :param sensor_ids: int
+        :return: dict
+        """
+        result_data = []
+        for sensor_id in sensor_ids:
+            period_data = HygroTempData.data_period(dt_from, dt_until, sensor_id)
+            aggr = func(period_data)
+            aggr['sensor_id'] = sensor_id
+            result_data.append(aggr)
+        return result_data
+    return wrapper
 
 
 class HygroTempData(models.Model):
@@ -48,37 +74,33 @@ class HygroTempData(models.Model):
 
     @staticmethod
     def data_period(dt_from, dt_until, sensor_id):
+        """
+        Returns data between dt_from and dt_until from the given Sensor
+        :param dt_from: datetime
+        :param dt_until: datetime
+        :param sensor_id: int
+        :return: Queryset
+        """
         lt_exclude = HygroTempData.objects.filter(sensor_id=sensor_id).exclude(timestamp__lt=dt_from)
         return lt_exclude.exclude(timestamp__gt=dt_until)
 
     @staticmethod
-    def mean(dt_from, dt_until, *sensor_ids):
+    def mean_from_set(period_data):
         """
-        Returns the mean of humidity and temperature in the given time period
-        :param dt_from: datetime
-        :param dt_until: datetime
-        :param sensor_ids: int
-            data is taken from this sensors
-        :return: HygroTempData, list
-            returns a HygroTempData object if only one sensor is given and otherwise a list
-            with HygroTempData objects.
+        Returns the mean of humidity and temperature from the given Queryset
+        :param period_data: Queryset
+        :return: dict
+            dict contains keys temperature__avg and humidity__avg
         """
-        result_data = []
-        hum_mean, temp_mean = 0, 0
-        for sensor_id in sensor_ids:
-            period_data = HygroTempData.data_period(dt_from, dt_until, sensor_id)
-            pd_length = period_data.__len__()
+        return period_data.aggregate(Avg('temperature'), Avg('humidity'))
 
-            partial_sum_temp = 0
-            partial_sum_hum = 0
-            for data in period_data:
-                partial_sum_temp += data.temperature
-                partial_sum_hum += data.humidity
-            temp_mean, hum_mean = partial_sum_temp / pd_length, partial_sum_hum / pd_length
-            result_data.append(HygroTempData(sensor_id=sensor_id, temperature=temp_mean, humidity=hum_mean))
-        if sensor_ids.__len__() == 1:
-            return HygroTempData(sensor_id=sensor_ids[0], humidity=hum_mean, temperature=temp_mean)
-        return result_data
+    @staticmethod
+    def max_from_set(period_data):
+        return period_data.aggregate(Max('temperature'), Max('humidity'))
+
+    @staticmethod
+    def min_from_set(period_data):
+        return period_data.aggregate(Min('temperature'), Min('humidity'))
 
     @staticmethod
     def latest_data(sensor_id):

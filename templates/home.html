@@ -22,11 +22,13 @@
             </button>
         </div>
         <div class="col">
-            <select id="sensor-select">
-                {% for s in sensor %}
-                    <option value="{{ s.sensor_id }}">Sensor {{ s.sensor_id }}</option>
-                {% endfor %}
-            </select>
+            <div class="col-4">
+                <select id="sensor-select" class="custom-select">
+                    {% for s in sensor %}
+                        <option value="{{ s.sensor_id }}">Sensor {{ s.sensor_id }}</option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
     </div>
 
