@@ -1,4 +1,4 @@
-"""plantcontrol URL Configuration
+"""relaysensorcontrol URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/2.0/topics/http/urls/
@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include, url
 
-app_name = "plantcontrol"
+app_name = "relaysensorcontrol"
 
 urlpatterns = [
     path('admin/', admin.site.urls),
