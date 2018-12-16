@@ -131,14 +131,14 @@ def sunrise_sunset(day=int(datetime.now().day), month=int(datetime.now().month),
         set_T = set_hour + RA_a - (0.06571 * t) - 6.622
         set_UT = adjust_value24(set_T - lng_hour)
         if not utc:
-            set_UT = set_UT - utc_offset() / 3600
+            set_UT = set_UT + utc_offset() / 3600
         extracted_set_time = extract_time(set_UT)
         set_datetime = datetime(year, month, day, extracted_set_time['hours'], extracted_set_time['minutes'],
                                 extracted_set_time['seconds'], extracted_set_time['microseconds'])
     UT = T - lng_hour
     sun_time = adjust_value24(UT)
     if not utc:
-        sun_time = sun_time - utc_offset() / 3600
+        sun_time = sun_time + utc_offset() / 3600
     extracted_time = extract_time(sun_time)
     calc_datetime = datetime(year, month, day, extracted_time['hours'], extracted_time['minutes'],
                              extracted_time['seconds'], extracted_time['microseconds'])
@@ -184,6 +184,5 @@ def adjust_value24(x):
 
 
 def utc_offset():
-    if time.daylight == 0:
-        return time.timezone
-    return time.altzone
+    ts = time.time()
+    return (datetime.fromtimestamp(ts) - datetime.utcfromtimestamp(ts)).total_seconds()
